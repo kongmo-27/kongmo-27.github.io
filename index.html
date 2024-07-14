@@ -69,6 +69,106 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-利用frp穿透转发本机的hexo服务" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/07/14/%E5%88%A9%E7%94%A8frp%E7%A9%BF%E9%80%8F%E8%BD%AC%E5%8F%91%E6%9C%AC%E6%9C%BA%E7%9A%84hexo%E6%9C%8D%E5%8A%A1/" class="article-date">
+  <time class="dt-published" datetime="2024-07-14T08:41:24.000Z" itemprop="datePublished">2024-07-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2024/07/14/%E5%88%A9%E7%94%A8frp%E7%A9%BF%E9%80%8F%E8%BD%AC%E5%8F%91%E6%9C%AC%E6%9C%BA%E7%9A%84hexo%E6%9C%8D%E5%8A%A1/">利用frp穿透转发本机的hexo服务</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>还没整云服务器，先整了本地的</p>
+</blockquote>
+<h2 id="配置虚拟机的Frp"><a href="#配置虚拟机的Frp" class="headerlink" title="配置虚拟机的Frp"></a>配置虚拟机的Frp</h2><ol>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/fatedier/frp/releases">这是下载地址</a></p>
+<p>在里面找到适合的版本，这里选择了linux_amd64的那个，右键复制链接。</p>
+<p><img src="https://raw.githubusercontent.com/kongmo-27/tuchuang/master/image-20240714165013324.png" alt="image-20240714165013324"></p>
+</li>
+<li><p>打开虚拟机，打开终端</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> frp <span class="comment">#来一个文件夹，方便操作</span></span><br><span class="line"><span class="built_in">cd</span> frp/ <span class="comment">#进入这个文件夹</span></span><br><span class="line">wget &lt;这里粘贴上刚才复制的链接&gt; <span class="comment">#下载压缩包，然后等待</span></span><br><span class="line">tar -zxvf &lt;这里写刚才下载好的压缩包的文件名，比如frp_0.59.0_linux_amd64.tar.gz&gt; <span class="comment">#解压缩</span></span><br><span class="line"><span class="built_in">ls</span> <span class="comment">#查看目录</span></span><br><span class="line"><span class="built_in">cd</span> &lt;这里写解压好的文件名，比如说frp_0.59.0_linux_amd64&gt; <span class="comment">#进入目录</span></span><br><span class="line">vim frps.ini <span class="comment">#建一个文件，并编辑，把后面的frps.ini的内容放进去。</span></span><br><span class="line">             <span class="comment">#:wq保存并退出frps.ini</span></span><br><span class="line">./frps verify -c frps.ini <span class="comment">#确认一下有没有出问题，不出意外的话会返回ok.</span></span><br><span class="line">./frps -c frps.ini <span class="comment">#开始运行</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/kongmo-27/tuchuang/master/image-20240714170821389.png" alt="image-20240714170821389"></p>
+<blockquote>
+<p>这样就没啥问题。</p>
+</blockquote>
+<p><strong>frps.ini</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[common]</span><br><span class="line">bind_addr = 0.0.0.0</span><br><span class="line">bind_port = 7000</span><br><span class="line">vhost_http_port = 8080</span><br><span class="line">dashboard_addr = 0.0.0.0</span><br><span class="line">dashboard_port = 7001</span><br><span class="line">dashboard_user = root</span><br><span class="line">dashboard_pwd = 123456</span><br><span class="line">token = 00xf2e367894f7</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>回物理机测试一下</p>
+<p>在物理机里访问http:&#x2F;&#x2F;&lt;虚拟机的ip&gt;:7001</p>
+<p>第一次访问时需要登陆，用户与密码就是frps.ini里的用户与密码。</p>
+<p><img src="https://raw.githubusercontent.com/kongmo-27/tuchuang/master/image-20240714171440493.png" alt="image-20240714171440493"></p>
+<blockquote>
+<p>这样就没问题，如果出现问题的话看<a href="#%E8%B0%83%E6%95%B4%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%98%B2%E7%81%AB%E5%A2%99">调整虚拟机防火墙</a>。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="在物理机转发hexo服务"><a href="#在物理机转发hexo服务" class="headerlink" title="在物理机转发hexo服务"></a>在物理机转发hexo服务</h2><blockquote>
+<p>记得把<code>hexo s</code>一直开着。</p>
+</blockquote>
+<ol>
+<li><p>准备好Frp文件，<a target="_blank" rel="noopener" href="https://github.com/fatedier/frp/releases">这是下载地址</a></p>
+<p>在里面选择对应的windows版本的frp，下载一个压缩包并解压。</p>
+<blockquote>
+<p>解压时候要调整一下解压位置，最好解压在合适的文件夹里。</p>
+</blockquote>
+</li>
+<li><p>配置必要文件</p>
+<p>打开cmd，进入刚才解压好的文件夹里。</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> frp/</span><br><span class="line"><span class="built_in">dir</span> /b#看一下文件夹里有什么文件，应该是下图这样</span><br></pre></td></tr></table></figure>
+
+<p>   <img src="https://raw.githubusercontent.com/kongmo-27/tuchuang/master/image-20240714172811094.png" alt="image-20240714172811094"></p>
+   <figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span>.&gt;web.ini #创建一个web.ini，一会用</span><br></pre></td></tr></table></figure>
+
+<p>   暂离cmd，然后再frp文件夹内找到刚刚创建的web.ini，用记事本编辑内容，照着后面给的web.ini文件复制上就行。</p>
+<p><strong>web.ini</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[common]</span><br><span class="line">server_addr = &lt;这里填虚拟机的ip&gt;</span><br><span class="line">server_port = 7000</span><br><span class="line">token = 00xf2e367894f7</span><br><span class="line">[web]</span><br><span class="line"><span class="built_in">type</span> = http</span><br><span class="line">local_ip = 127.0.0.1</span><br><span class="line">local_port = 4000</span><br><span class="line">remote_port = 8080</span><br><span class="line">custom_domains = &lt;这里填虚拟机的ip&gt;</span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>转发hexo服务</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">frpc -c web.ini #启动服务</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/kongmo-27/tuchuang/master/image-20240714173851575.png" alt="image-20240714173851575"></p>
+<p>这样就成了，在物理机访问&lt;虚拟机ip&gt;:8080，不出意外就可以看到自己的博客了。</p>
+</li>
+</ol>
+<h2 id="调整虚拟机防火墙"><a href="#调整虚拟机防火墙" class="headerlink" title="调整虚拟机防火墙"></a>调整虚拟机防火墙</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看一下用到的几个端口是否都在开放列表内了。</span></span><br><span class="line">firewall-cmd --list-all</span><br><span class="line"><span class="comment">#如果没有的话就</span></span><br><span class="line">firewall-cmd --permanent --add-port=&lt;目标端口，比如7001&gt;/tcp <span class="comment">#tcp或udp，按需修改。</span></span><br><span class="line"><span class="comment">#然后</span></span><br><span class="line">firewall-cmd --reload</span><br><span class="line"><span class="comment">#再试一次，应该就行了。</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>公网上的以后再说（</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2024/07/14/%E5%88%A9%E7%94%A8frp%E7%A9%BF%E9%80%8F%E8%BD%AC%E5%8F%91%E6%9C%AC%E6%9C%BA%E7%9A%84hexo%E6%9C%8D%E5%8A%A1/" data-id="clylecadn00031kfhh1vs1bww" data-title="利用frp穿透转发本机的hexo服务" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-虚拟机上搭建本地服务器" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2024/07/13/%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E6%90%AD%E5%BB%BA%E6%9C%AC%E5%9C%B0%E6%9C%8D%E5%8A%A1%E5%99%A8/" class="article-date">
@@ -255,7 +355,7 @@ service network restart
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2024/07/13/%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E6%90%AD%E5%BB%BA%E6%9C%AC%E5%9C%B0%E6%9C%8D%E5%8A%A1%E5%99%A8/" data-id="clyk5zcya0001twfhfc2eczzc" data-title="虚拟机上搭建本地服务器" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2024/07/13/%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E6%90%AD%E5%BB%BA%E6%9C%AC%E5%9C%B0%E6%9C%8D%E5%8A%A1%E5%99%A8/" data-id="clylecadk00011kfh4ifu8hxt" data-title="虚拟机上搭建本地服务器" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -354,7 +454,7 @@ service network restart
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2024/07/13/Markdown%E5%B8%B8%E7%94%A8%E8%AF%AD%E6%B3%95/" data-id="clyk5zcy30000twfhgvaf9iti" data-title="Markdown常用语法" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2024/07/13/Markdown%E5%B8%B8%E7%94%A8%E8%AF%AD%E6%B3%95/" data-id="clylecadh00001kfh3yxsb6b9" data-title="Markdown常用语法" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -395,7 +495,7 @@ service network restart
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2024/07/08/%E6%AD%A3%E5%9C%A8%E5%BC%95%E5%AF%BC/" data-id="clydooj8w0004e8md5rxifmem" data-title="正在引导" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2024/07/08/%E6%AD%A3%E5%9C%A8%E5%BC%95%E5%AF%BC/" data-id="clylecadn00041kfh7smlh5j5" data-title="正在引导" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -446,7 +546,7 @@ service network restart
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2024/07/08/hello-world/" data-id="clydooj8p0001e8md3i74aorq" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2024/07/08/hello-world/" data-id="clylecadm00021kfhh3vbgdxg" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -487,6 +587,10 @@ service network restart
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2024/07/14/%E5%88%A9%E7%94%A8frp%E7%A9%BF%E9%80%8F%E8%BD%AC%E5%8F%91%E6%9C%AC%E6%9C%BA%E7%9A%84hexo%E6%9C%8D%E5%8A%A1/">利用frp穿透转发本机的hexo服务</a>
+          </li>
         
           <li>
             <a href="/2024/07/13/%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E6%90%AD%E5%BB%BA%E6%9C%AC%E5%9C%B0%E6%9C%8D%E5%8A%A1%E5%99%A8/">虚拟机上搭建本地服务器</a>
